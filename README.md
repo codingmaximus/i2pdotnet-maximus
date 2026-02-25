@@ -4,7 +4,7 @@ A .NET library for using the I2P Simple Anonymous Messaging (SAM v3.0) bridge.
 
 Supported platforms:
 
-- .NET Standard 1.6
+- .NET Standard 2.0
 
 This includes the .NET Framework, .NET Core, UWP and more.
 
