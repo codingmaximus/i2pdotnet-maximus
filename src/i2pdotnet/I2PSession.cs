@@ -31,15 +31,17 @@ namespace I2PNet
         
         private bool isListeningForIncomingConnections;
 
-        public I2PSession(int samPort, int? listenPort = null)
+        public I2PSession(int samPort, IPAddress samIPaddress = null, int? listenPort = null)
         {
             SamPort = samPort;
+            SamIPaddress = samIPaddress;
             ListenPort = listenPort;
             sessionId = new Random().Next();
-            controlSocket = new I2PSamConnection(SamPort);
+            controlSocket = new I2PSamConnection(SamPort, samIPaddress);
         }
 
         public int SamPort { get; }
+        public IPAddress SamIPaddress { get; }
 
         public int? ListenPort { get; }
 
@@ -56,7 +58,7 @@ namespace I2PNet
 
         public async Task<Stream> ConnectAsync(string remoteDestination)
         {
-            var connectionStream = new I2PSamConnection(SamPort);
+            var connectionStream = new I2PSamConnection(SamPort, SamIPaddress);
             await connectionStream.Connect();
             await connectionStream.SendCommand($"STREAM CONNECT ID={sessionId} DESTINATION={remoteDestination}");
             return connectionStream.GetStream();
@@ -74,7 +76,7 @@ namespace I2PNet
             isListeningForIncomingConnections = true;
             listener.Start();
 
-            var streamForwarder = new I2PSamConnection(SamPort);
+            var streamForwarder = new I2PSamConnection(SamPort, SamIPaddress);
             await streamForwarder.Connect();
             await streamForwarder.SendCommand($"STREAM FORWARD ID={sessionId} PORT={ListenPort}");
 

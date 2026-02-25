@@ -28,14 +28,16 @@ namespace I2PNet
     internal class I2PSamConnection : IDisposable
     {
         private readonly int samPort;
+        private readonly IPAddress samIPaddress;
 
         private TcpClient client;
         private StreamReader reader;
         private BinaryWriter writer;
 
-        public I2PSamConnection(int samPort)
+        public I2PSamConnection(int samPort, IPAddress samIPaddress = null)
         {
             this.samPort = samPort;
+            this.samIPaddress = samIPaddress ?? IPAddress.Loopback;
         }
 
         public void Dispose()
@@ -48,7 +50,7 @@ namespace I2PNet
         public async Task Connect()
         {
             client = new TcpClient();
-            await client.ConnectAsync(IPAddress.Loopback, samPort);
+            await client.ConnectAsync(samIPaddress, samPort);
 
             var stream = client.GetStream();
 
@@ -60,7 +62,7 @@ namespace I2PNet
 
         public Task<IDictionary<string, string>> SendCommand(string command)
         {
-            Console.WriteLine("> " + command);
+            //Console.WriteLine("> " + command);
 
             writer.Write(Encoding.UTF8.GetBytes(command + "\n"));
 
@@ -68,7 +70,7 @@ namespace I2PNet
             {
                 var responseLine = reader.ReadLine();
 
-                Console.WriteLine(responseLine);
+                //Console.WriteLine(responseLine);
 
                 var response = responseLine.Split(' ');
                 var responseDict = response.Skip(2)
